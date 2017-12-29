@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="js/util.js"></script>
+        <script src="js/component.js"></script>
+
+        <style>
+            .dir{
+                background:#FFF7B2;
+                border: 1px solid #aaa;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .file-row{
+                display: inline-block;
+                padding: 1px 3px;
+            }
+
+            .row {
+                border:1px solid transparent;
+                margin-bottom: 10px;
+                padding: 2px 0;
+            }
+
+            .row:hover{
+                background: #e5f3ff;
+            }
+
+            .row.selected {
+                border: 1px solid #99deff;
+                background: #cce8ff;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div>当前路径: <span id="currentPathElem"></span></div>
+        <div id="list">
+        </div>
+
+        <script>
+            var currentPath = "/";
+            currentPathElem.innerHTML = currentPath;
+
+            async function getFileList() {
+                let result = await api.getFileList({dir: currentPath});
+                if(result.success){
+                    list.innerHTML = "";
+                    for(let menu of result.data.menu) {
+                        let elem = fileListRow (menu) ;
+                        list.appendChild(elem);
+                        elem.addEventListener('click',function(){
+                            var el = document.querySelector(".selected");
+                            if(el){
+                                removeClass(el,'selected');
+                            }
+                            addClass(this,'selected');
+                        });
+
+                        let elemChild = elem.querySelector(".file-row");
+                        elemChild.addEventListener('dblclick',()=>{
+                            let p = elemChild.getAttribute("path");
+                            currentPath = p;
+                            this.getFileList();
+                            currentPathElem.innerHTML = currentPath;
+                        })
+                    }
+                }
+            }
+            getFileList();
+        </script>
+    </body>
+</html>
